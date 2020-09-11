@@ -7,3 +7,5 @@ Sripada, C., Angstadt, M., Rutherford, S., Taxali, A., Greathouse, T., Clark, D.
 https://www.biorxiv.org/content/10.1101/2020.08.21.260927v1
 
 Relies on functions from https://www.github.com/mangstad/Misc_utils
+
+Data files necessary for this analysis should eventually be available through NDAR, will update when that study is live.
