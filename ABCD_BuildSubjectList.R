@@ -96,33 +96,8 @@ pdem$HouseholdMaritalStatus = temp
 
 pdem = pdem[,c(mergecols,"Age","Gender","RaceEthnicity","HighestParentalEducation","HouseholdMaritalStatus","HouseholdIncome")]
 
-#fs = read.abcd(file.path(ABCDDataDir,"freesqc01.txt"))
-#fs = fs[,c(mergecols,"fsqc_qc")]
-
 gp = read.csv(file.path(DataDir,"ABCD_phenotypic_data_BPM.csv"))
-#gp = gp[,c(mergecols,"g","g1","g2","g3","g4",
-#  "G_Dave","S1","S2","S3","pc1_new","pc2_new","pc3_new",
-#  "PF10","PF10_EXT","PF10_INT",
-#  "nihtbx_picvocab_uncorrected","nihtbx_flanker_uncorrected",
-#  "nihtbx_list_uncorrected","nihtbx_cardsort_uncorrected",
-#  "nihtbx_pattern_uncorrected","nihtbx_picture_uncorrected",
-#  "nihtbx_reading_uncorrected","pea_ravlt_sd_tc","pea_ravlt_ld_tc",
-#  "pea_wiscv_trs","lmt_scr_num_correct")]
 gp = gp[,c(mergecols,"PF10","PF10_EXT","PF10_INT")]
-
-#nih = read.abcd(file.path(ABCDDataDir,"abcd_tbss01.txt"))
-#nih = nih[,c(mergecols,"nihtbx_picvocab_uncorrected",
-#  "nihtbx_flanker_uncorrected","nihtbx_list_uncorrected",
-#  "nihtbx_cardsort_uncorrected","nihtbx_pattern_uncorrected",
-#  "nihtbx_picture_uncorrected","nihtbx_reading_uncorrected")]
-
-#ps = read.abcd(file.path(ABCDDataDir,"abcd_ps01.txt"))
-#ps$pea_ravlt_sd_tc = rowSums(ps[,names(ps)[grepl("pea_ravlt_sd.*_tc",names(ps))]])
-#ps$pea_ravlt_ld_tc = ps$pea_ravlt_ld_trial_vii_tc
-#ps = ps[,c(mergecols,"pea_ravlt_sd_tc","pea_ravlt_ld_tc","pea_wiscv_trs")]
-
-#lmt = read.abcd(file.path(ABCDDataDir,"lmtp201.txt"))
-#lmt = lmt[,c(mergecols,"lmt_scr_num_correct")]
 
 #propensity weights
 pw = read.abcd(file.path(ABCDDataDir,"acspsw03.txt"))
@@ -144,7 +119,8 @@ data$Include.demo = !is.na(data$Age) & !is.na(data$Gender) & data$Gender!="" & !
 data$Include.p = !is.na(data$PF10)
 
 #exclude for any data problems, like NaN ROIs etc
-data$Include.data = !(data$subjectkey %in% c("NDAR_INVJZCYWRZB"))
+nansubs = read.csv(file.path(DataDir,"nan_subs.csv"))
+data$Include.data = !(data$subjectkey %in% nansubs$subjectkey)
 
 data$Include = data$Include.rest & data$Include.demo & data$Include.p & data$Include.data
 
@@ -155,18 +131,18 @@ data$Subject = gsub("NDAR_","NDAR",data$subjectkey)
 
 sum(data$Include)
 
-#data$IncludeUnrelated = 1
+data$IncludeUnrelated = 1
 
-#t = table(data$rel_family_id)
-#w = which(t>1)
+t = table(data$rel_family_id)
+w = which(t>1)
 
-#set.seed(12345)
-#for (i in 1:length(w)) {
-#  f = names(w)[i]
-#  idx = which(data$rel_family_id == f)
-#  s = sample(length(idx),length(idx)-1)
-#  data$IncludeUnrelated[idx[s]] = 0
-#}
+set.seed(12345)
+for (i in 1:length(w)) {
+  f = names(w)[i]
+  idx = which(data$rel_family_id == f)
+  s = sample(length(idx),length(idx)-1)
+  data$IncludeUnrelated[idx[s]] = 0
+}
 
 #check for families that cross site
 t = table(data$rel_family_id,data$site_id_l)
