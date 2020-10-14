@@ -10,9 +10,16 @@ DataFile = [Exp '/Scripts/pfactor/Data/ABCD_rest.csv'];
 CorrTemplate = [Exp '/Rest/Gordon_Sub_Cere/[Subject].txt'];
 NetsFile = [Exp '/Scripts/pfactor/Data/gordon_sub_cere_parcels.csv'];
 
+IncludeTwins = 1;
+
 %%
 %setup
 dat = readtable(DataFile);
+
+%to drop twins
+if (IncludeTwins==0)
+    dat = dat(dat.IncludeRelated==1,:);
+end
 
 N = size(dat,1);
 nROI = 418;
