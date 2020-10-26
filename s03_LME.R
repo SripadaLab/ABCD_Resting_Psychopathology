@@ -1,4 +1,3 @@
-#library(caret)
 library(MuMIn)
 setwd("/net/pepper/ABCD/CIFTI/Scripts/pfactor/")
 
@@ -105,3 +104,29 @@ summary(model_reduced)
 anova(model)
 anova(model_reduced)
 anova(model, model_reduced)
+
+
+#loop to drop 1 component each time
+
+n_components=250
+for (i in 1:n_components) {
+     icomp[i] <- sprintf("A%03d",i) # fix to 3 characters 
+}
+
+importance = c()
+for (i in 1:n_components) {
+  print(i)
+  brain_formula = paste(icomp[-i],collapse=" + ")
+
+  fmladrop = paste(dependent, ' ~ ', brain_formula,' + ',
+             paste(controls, collapse=' + '), ' + ', 
+             nested_str, sep='')
+  model_drop1 = lmer(formula=fmladrop, data=dat, na.action='na.exclude')
+  importance[i]=r.squaredGLMM(model)[1]-r.squaredGLMM(model_drop1)[1]
+
+}
+
+Component = order(importance,decreasing=T)
+deltaR2 = importance[Component]
+tmp = data.frame(Component=Component,deltaR2=deltaR2)
+write.csv(tmp,'Results/component_importance.csv')

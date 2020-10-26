@@ -9,16 +9,27 @@ Exp = '/net/pepper/ABCD/CIFTI/';
 DataFile = [Exp '/Scripts/pfactor/Data/ABCD_rest.csv'];
 CorrTemplate = [Exp '/Rest/Gordon_Sub_Cere/[Subject].txt'];
 NetsFile = [Exp '/Scripts/pfactor/Data/gordon_sub_cere_parcels.csv'];
+Perms = [Exp '/Scripts/pfactor/Data/perms_5880.mat'];
 
+LowMotion = 0;
 IncludeTwins = 1;
+RemoveSite = 0;
 
 %%
 %setup
 dat = readtable(DataFile);
 
+if (LowMotion==1)
+    dat = dat(dat.fd<0.2,:);
+    Perms = [Exp '/Scripts/pfactor/Data/perms_2853.mat'];
+end
+
+perms = load(Perms);
+perms = perms.pset;
+
 %to drop twins
 if (IncludeTwins==0)
-    dat = dat(dat.IncludeRelated==1,:);
+    dat = dat(dat.IncludeUnrelated==1,:);
 end
 
 N = size(dat,1);
@@ -54,6 +65,22 @@ sitesize = zeros(nFold,1);
 for iFold = 1:nFold
     folds(dat.abcd_site_num==u(iFold)) = iFold;
     sitesize(iFold) = sum(folds==iFold);
+end
+
+if (RemoveSite==1) 
+    dummy_site = mc_Vector2Mask(folds);
+    [~,i] = max(sum(dummy_site));
+    dummy_site(:,i) = [];
+    X = [ones(size(featuremat,1),1) dummy_site];
+    b = pinv(X'*X)*X'*featuremat;
+    res = featuremat - X*b;
+    featuremat_orig = featuremat;
+    featuremat = res;
+    
+    mainpheno_orig = mainpheno;
+    b = pinv(X'*X)*X'*mainpheno;
+    res = mainpheno - X*b;
+    mainpheno = res;
 end
 
 %%
