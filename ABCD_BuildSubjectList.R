@@ -4,25 +4,25 @@ source("setup.R")
 mergecols = c("subjectkey","eventname")
 
 #load family data
-fam = read.abcd(paste0(ABCDDataDir,"acspsw03.txt"))
+fam = read.abcd(file.path(ABCDDataDir,"acspsw03.txt"))
 fam = fam[,c(mergecols,"rel_family_id")]
 
 #load site data
-site = read.abcd(paste0(ABCDDataDir,"abcd_lt01.txt"))
+site = read.abcd(file.path(ABCDDataDir,"abcd_lt01.txt"))
 site = site[,c(mergecols,"site_id_l")]
 
 #load meanFD data and DOF totals
-motion = read.csv(paste0(DataDir,"meanfd.csv"))
+motion = read.csv(file.path(DataDir,"meanfd.csv"))
 motion$dofavg = motion$dof/motion$runs
 motion$censoredavg = motion$censored/motion$runs
 motion$subjectkey = gsub("NDAR","NDAR_",motion$subjectkey)
 motion$eventname = "baseline_year_1_arm_1"
 
 #generate nuisance covariates from raw ABCD files
-pdem = read.abcd(paste0(ABCDDataDir,"pdem02.txt"))
+pdem = read.abcd(file.path(ABCDDataDir,"pdem02.txt"))
 cols = c(mergecols,"interview_age","sex","demo_sex_v2",
          "demo_comb_income_v2","demo_prnt_marital_v2",
-         "demo_prnt_ed_v2","demo_prtnr_ed_v2","demo_ethn_v2",
+         "demo_Prnt_ed_v2","demo_prtnr_ed_v2","demo_ethn_v2",
          paste0("demo_race_a_p___",c(10:25,77,99)))
 pdem = pdem[,cols]
 pdem$re_white = as.numeric(pdem$demo_race_a_p___10==1)

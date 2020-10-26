@@ -30,7 +30,8 @@ build_color_function = function(max) {
   color_function
 }
 
-plot_circlegraph = function(mat,ZTHRESH,PercThresh,Range=NULL,Filename,IncludeList=1:16) {
+#if Plot==TRUE, it ignores Filename and just plots the image in the R graphics window
+plot_circlegraph = function(mat,ZTHRESH,PercThresh,Range=NULL,Filename,IncludeList=1:16,Plot=TRUE) {
   NetworkNames = c('SM','SMM','CO','AUD','DMN','','VIS','FPN','SAL','SC','VAN','DAN','CER','UNC','CP','RST')
   NetworkNamesFactor = factor(1:16,levels=1:16,labels=NetworkNames)
   
@@ -65,10 +66,10 @@ plot_circlegraph = function(mat,ZTHRESH,PercThresh,Range=NULL,Filename,IncludeLi
   olabels = dat$Community[o]
   
   smallmat = mat[o,o]
-  image(smallmat)
+  #image(smallmat)
   
   smallmat = smallmat[onets %in% IncludeList,onets %in% IncludeList]
-  image(smallmat)
+  #image(smallmat)
   
   smallmat[smallmat>0] = 1
   smallmat[smallmat<0] = -1
@@ -106,11 +107,12 @@ plot_circlegraph = function(mat,ZTHRESH,PercThresh,Range=NULL,Filename,IncludeLi
   col_fun = build_color_function(Range)
   op = par()
   
-  
-  svg(filename=paste0("Results/",Filename,".svg"), 
-      width=8, 
-      height=8, 
-      pointsize=12)
+  if (Plot==TRUE) {
+    svg(filename=paste0("Results/",Filename,".svg"), 
+        width=8, 
+        height=8, 
+        pointsize=12)
+  }
   circos.clear()
   circos.par(gap.after = c(rep(5,length(IncludeList))))
   chordDiagram(a_thresh[,1:3],
@@ -129,5 +131,7 @@ plot_circlegraph = function(mat,ZTHRESH,PercThresh,Range=NULL,Filename,IncludeLi
                 facing = "bending.outside", niceFacing = T, col = "black",font=2,cex=2)
   }
   par(op)
-  dev.off()
+  if (Plot==TRUE) {
+    dev.off()
+  }
 }
