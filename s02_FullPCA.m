@@ -11,6 +11,9 @@ mu = mean(featuremat);
 x = bsxfun(@minus,featuremat,mu);
 Aall = x*coeffall(:,1:NumComp);
 
+comps = coeffall(:,1:NumComp);
+save('Results/components250.txt','comps','-ASCII');
+
 %%
 %Save out file with first 250 component expressions for lme model in R
 subjectkey = dat.subjectkey;
